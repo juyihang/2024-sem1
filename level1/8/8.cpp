@@ -4,22 +4,24 @@
 #include <fstream>
 using namespace std;
 const int MAXN=160;
+const int LEVEL_NUM=10;
 char map[MAXN][MAXN];
 bool box[MAXN][MAXN];
-int px,py,mx,my,score,step,perfectsteps,num,res,a;
+int Highest_Score[LEVEL_NUM];
+int px,py,mx,my,score,step,perfectsteps,num,a;
 // @ spawn  # border P player O box . path X dest
 inline void pushbox(int x,int y,int dir){
     if(dir==1&&x-1>=0){
-        if(map[x-1][y]!='#'&&map[x-1][y]!='O') box[x-1][y]=1,box[x][y]=0;
+        if(map[x-1][y]!='#'&&!box[x-1][y]) box[x-1][y]=1,box[x][y]=0;
     }
     else if(dir==2&&y-1>=0){
-        if(map[x][y-1]!='#'&&map[x][y-1]!='O') box[x][y-1]=1,box[x][y]=0;
+        if(map[x][y-1]!='#'&&!box[x][y-1]) box[x][y-1]=1,box[x][y]=0;
     }
     else if(dir==3&&x+1<mx){
-        if(map[x+1][y]!='#'&&map[x+1][y]!='O') box[x+1][y]=1,box[x][y]=0;
+        if(map[x+1][y]!='#'&&!box[x+1][y]) box[x+1][y]=1,box[x][y]=0;
     }
     else if(dir==4&&y+1<my){
-        if(map[x][y+1]!='#'&&map[x][y+1]!='O') box[x][y+1]=1,box[x][y]=0;
+        if(map[x][y+1]!='#'&&!box[x][y+1]) box[x][y+1]=1,box[x][y]=0;
     }
 }
 inline bool jud(int x,int y,int dir){
@@ -28,7 +30,7 @@ inline bool jud(int x,int y,int dir){
     if(box[x][y]){
         pushbox(x,y,dir);
     }
-    px=x,py=y;
+    px=x,py=y;step++;
     return true;
 }
 inline void printmap(){
@@ -66,6 +68,14 @@ inline void maze(){
     }
 
 }
+inline int Calc_PlayerScore(){
+    int res=100;
+    if(step<perfectsteps) return res+20;
+    if(step==perfectsteps) return res;
+    if(step>perfectsteps&&step<2*perfectsteps) return 10+(res-10)*(step-perfectsteps)/perfectsteps;
+    else return 10;
+    return -1;
+}
 int main(){
     //input maze
     cout<<"please select the level from 1 to 5 "<<endl;
@@ -77,9 +87,13 @@ int main(){
     else if(a==4) infile.open("level4.txt");
     else if(a==5) infile.open("level5.txt");
     else{
-        cout<<"can't find the level"<<endl;
+        cout<<"can't find the level"<<endl; return 0;
     }
     infile>>mx>>my>>perfectsteps;
+    fstream Load_Score_infile("record.txt");
+    for(int i=1;i<=5;i++){
+        Load_Score_infile>>Highest_Score[i];
+    }
     for(int i=0;i<mx;i++){
         for(int j=0;j<my;j++){
             infile>>map[i][j];
@@ -99,10 +113,18 @@ int main(){
     }
     printmap();
     cout<<endl;
-    cout<<"Stage Clear"<<endl;
-    cout<<score<<endl;
-    fstream outfile("record.txt",ios::app);
-    outfile<<"In level "<<a<<" : "<<score<<endl;
-    outfile.close();
+    cout<<"  ---  Stage Clear  ---  "<<endl;
+    cout<<endl;
+    cout<<"Your steps are : "<<step<<endl;
+    cout<<"Your Score is : "<<Calc_PlayerScore()<<endl;
+    if(Calc_PlayerScore()>Highest_Score[a]){
+        cout<<"You Have Achieved a new record !"<<endl;
+        Highest_Score[a]=Calc_PlayerScore();
+        fstream outfile("record.txt");
+        for(int i=1;i<=5;i++) outfile<<Highest_Score[i]<<" ";
+        outfile.close();
+    }
+    cout<<"The Highest score is : "<<Highest_Score[a]<<endl;
+    system("pause");
     return 0;
 }
