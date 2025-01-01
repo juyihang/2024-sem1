@@ -1,0 +1,3 @@
+C:/Users/H/CLionProjects/WZQ AI/cmake-build-debug/CMakeFiles/WZQ_AI.dir
+C:/Users/H/CLionProjects/WZQ AI/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/H/CLionProjects/WZQ AI/cmake-build-debug/CMakeFiles/rebuild_cache.dir
